@@ -1,4 +1,3 @@
-import { useLoader } from "../hooks/useLoader"
 import { auth } from "@/services/firebase"
 import { onAuthStateChanged, User } from "firebase/auth"
 import { createContext, ReactNode, useEffect, useState } from "react"
@@ -10,26 +9,24 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
-  loading: false
+  loading: true
 })
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const { showLoader, hideLoader, isLoading } = useLoader()
   const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    showLoader()
-    const unsucribe = onAuthStateChanged(auth, (usr) => {
+    const unsubscribe = onAuthStateChanged(auth, (usr) => {
       setUser(usr)
-      hideLoader()
+      setLoading(false)
     })
 
-    // cleanup function (component unmount)
-    return () => unsucribe()
+    return unsubscribe
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, loading: isLoading }}>
+    <AuthContext.Provider value={{ user, loading }}>
       {children}
     </AuthContext.Provider>
   )

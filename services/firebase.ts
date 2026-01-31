@@ -1,10 +1,9 @@
 import { initializeApp } from "firebase/app"
 import { getFirestore } from "firebase/firestore"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-// @ts-ignore
-import { initializeAuth } from "firebase/auth";
-// @ts-ignore
-import { getReactNativePersistence } from "firebase/auth/react-native";
+import { initializeAuth } from "firebase/auth"
+// @ts-ignore - Firebase v12 internal path
+import { getReactNativePersistence } from "@firebase/auth/dist/rn/index"
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY!,
@@ -14,6 +13,10 @@ const firebaseConfig = {
   messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID!,
   measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID!,
+}
+
+if (!firebaseConfig.apiKey) {
+  throw new Error("Firebase env variables not loaded")
 }
 
 const app = initializeApp(firebaseConfig)
