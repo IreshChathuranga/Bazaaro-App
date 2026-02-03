@@ -4,14 +4,14 @@ import {
   TextInput,
   Pressable,
   TouchableOpacity,
-  Alert,
   ScrollView,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native"
 import React, { useState } from "react"
 import { useRouter } from "expo-router"
 import { registerUser } from "@/services/authService"
 import { useLoader } from "@/hooks/useLoader"
+import { showToast } from "@/utils/toast"
 
 const Register = () => {
   const router = useRouter()
@@ -23,33 +23,40 @@ const Register = () => {
   const [conPassword, setConPassword] = useState("")
 
   const handleRegister = async () => {
-    if (!name || !email || !password || !conPassword || isLoading) {
-      Alert.alert("Please fill all fields")
+    // Validation
+    if (!name || !email || !password || !conPassword) {
+      showToast.error("Validation Error", "Please fill all fields")
       return
     }
 
     if (!email.includes("@")) {
-      Alert.alert("Please enter valid email")
+      showToast.error("Invalid Email", "Please enter a valid email address")
       return
     }
 
     if (password.length < 6) {
-      Alert.alert("Password must be at least 6 characters")
+      showToast.warning("Weak Password", "Password must be at least 6 characters")
       return
     }
 
     if (password !== conPassword) {
-      Alert.alert("Passwords do not match")
+      showToast.error("Password Mismatch", "Passwords do not match")
       return
     }
 
     showLoader()
     try {
       await registerUser(name, email, password)
-      Alert.alert("Success", "Account created successfully")
-      router.replace("/tabs/home")
+      showToast.success("Success! 🎉", "Account created successfully")
+      
+      // Wait a bit before navigating so user can see the success message
+      setTimeout(() => {
+        router.replace("/tabs/home")
+      }, 1500)
     } catch (e: any) {
-      Alert.alert("Register failed", e.message)
+      const errorMsg = e.message || "Registration failed"
+      showToast.error("Registration Failed", errorMsg)
+      console.error("Registration error:", e)
     } finally {
       hideLoader()
     }

@@ -1,23 +1,29 @@
-import { View, ActivityIndicator } from "react-native";
-import { Redirect } from "expo-router";
-import { useEffect, useState } from "react";
+import { View, Text, ActivityIndicator, Image } from "react-native"
+import { useEffect } from "react"
+import { useRouter } from "expo-router"
 
-const Index = () => {
-  const [loading, setLoading] = useState(true);
+export default function Index() {
+  const router = useRouter()
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 1000);
-  }, []);
+    setTimeout(() => {
+      router.replace("/auth/login") // or /tabs/home
+    }, 2000)
+  }, [])
 
-  if (loading) {
-    return (
-      <View className="flex-1 justify-center items-center bg-gray-50">
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
+  return (
+    <View className="flex-1 justify-center items-center bg-white">
+      <Image
+        source={require("../assets/logo.png")}
+        className="w-32 h-32 mb-6"
+        resizeMode="contain"
+      />
 
-  return <Redirect href="/auth/login" />;
-};
+      <ActivityIndicator size="large" color="#c97a52" />
 
-export default Index;
+      <Text className="mt-4 text-gray-500">
+        Loading...
+      </Text>
+    </View>
+  )
+}
