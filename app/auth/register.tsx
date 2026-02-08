@@ -4,14 +4,18 @@ import {
   TextInput,
   Pressable,
   TouchableOpacity,
+  Alert,
   ScrollView,
-  ActivityIndicator,
 } from "react-native"
 import React, { useState } from "react"
 import { useRouter } from "expo-router"
-import { registerUser } from "@/services/authService"
+import { LinearGradient } from "expo-linear-gradient"
 import { useLoader } from "@/hooks/useLoader"
-import { showToast } from "@/utils/toast"
+import { registerUser } from "@/services/authService"
+import * as Google from "expo-auth-session/providers/google"
+import { useFonts, Poppins_700Bold } from "@expo-google-fonts/poppins"
+import { Image } from "react-native"
+import { Feather } from "@expo/vector-icons"
 
 const Register = () => {
   const router = useRouter()
@@ -22,167 +26,171 @@ const Register = () => {
   const [password, setPassword] = useState("")
   const [conPassword, setConPassword] = useState("")
 
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    clientId: "YOUR_GOOGLE_CLIENT_ID",
+  })
+
+  const [fontsLoaded] = useFonts({
+    Poppins_700Bold,
+  })
+
+  if (!fontsLoaded) return null
+
   const handleRegister = async () => {
-    // Validation
     if (!name || !email || !password || !conPassword) {
-      showToast.error("Validation Error", "Please fill all fields")
-      return
-    }
-
-    if (!email.includes("@")) {
-      showToast.error("Invalid Email", "Please enter a valid email address")
-      return
-    }
-
-    if (password.length < 6) {
-      showToast.warning("Weak Password", "Password must be at least 6 characters")
+      Alert.alert("Please fill all fields")
       return
     }
 
     if (password !== conPassword) {
-      showToast.error("Password Mismatch", "Passwords do not match")
+      Alert.alert("Passwords do not match")
       return
     }
 
     showLoader()
     try {
       await registerUser(name, email, password)
-      showToast.success("Success! 🎉", "Account created successfully")
-      
-      // Wait a bit before navigating so user can see the success message
-      setTimeout(() => {
-        router.replace("/tabs/home")
-      }, 1500)
-    } catch (e: any) {
-      const errorMsg = e.message || "Registration failed"
-      showToast.error("Registration Failed", errorMsg)
-      console.error("Registration error:", e)
+      router.replace("/tabs/home")
+    } catch (e) {
+      Alert.alert("Registration failed")
     } finally {
       hideLoader()
     }
   }
 
   return (
-    <ScrollView
-      keyboardShouldPersistTaps="handled"
-      contentContainerStyle={{ flexGrow: 1 }}
-      className="bg-[#f8f7f4]"
-    >
-      <View className="flex-1 justify-center items-center px-5 py-10">
-        {/* Header Section */}
-        <View className="w-full mb-8 items-center">
-          <Text className="text-4xl font-bold text-center mb-2 text-[#1a1a1a]">
+    <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1 }}>
+      <LinearGradient
+        colors={["#0F1A14", "#2F4F3A", "#5B7F5A", "#9c9c9c"]}
+        className="flex-1 justify-center px-6"
+      >
+        {/* Logo */}
+        <Image
+          source={require("../../assets/bazaaro.png")}
+          style={{
+            width: 100,
+            height: 30,
+            alignSelf: "center",
+            marginBottom: 8
+          }}
+          resizeMode="contain"
+        />
+        <View style={{ marginBottom: 20 }}>
+          <Text
+            style={{
+              fontFamily: "Poppins_700Bold",
+              fontSize: 32,
+              color: "#ffffff",
+              textAlign: "center",
+            }}
+          >
             Create Account
           </Text>
-          <Text className="text-center text-base text-[#666]">
-            Join us and start your journey
+
+          <Text
+            style={{
+              fontSize: 14,
+              color: "#ffffffa8",
+              textAlign: "center",
+              marginTop: 3,
+              opacity: 0.8,
+            }}
+          >
+            Let’s Create Account Together
           </Text>
         </View>
 
-        {/* Form Container */}
-        <View className="w-full bg-white rounded-3xl p-7 shadow-lg">
-          {/* Name Input */}
-          <View className="mb-4">
-            <Text className="text-sm font-semibold mb-2 text-[#1a1a1a]">
-              Full Name
-            </Text>
-            <TextInput
-              placeholder="Enter your full name"
-              placeholderTextColor="#aaa"
-              className="border-2 border-[#e0e0e0] bg-[#f9f8f6] p-4 rounded-2xl text-base"
-              value={name}
-              onChangeText={setName}
-              editable={!isLoading}
-            />
-          </View>
-
-          {/* Email Input */}
-          <View className="mb-4">
-            <Text className="text-sm font-semibold mb-2 text-[#1a1a1a]">
-              Email Address
-            </Text>
-            <TextInput
-              placeholder="your.email@example.com"
-              placeholderTextColor="#aaa"
-              autoCapitalize="none"
-              keyboardType="email-address"
-              className="border-2 border-[#e0e0e0] bg-[#f9f8f6] p-4 rounded-2xl text-base"
-              value={email}
-              onChangeText={setEmail}
-              editable={!isLoading}
-            />
-          </View>
-
-          {/* Password Input */}
-          <View className="mb-4">
-            <Text className="text-sm font-semibold mb-2 text-[#1a1a1a]">
-              Password
-            </Text>
-            <TextInput
-              placeholder="Min 6 characters"
-              placeholderTextColor="#aaa"
-              secureTextEntry
-              className="border-2 border-[#e0e0e0] bg-[#f9f8f6] p-4 rounded-2xl text-base"
-              value={password}
-              onChangeText={setPassword}
-              editable={!isLoading}
-            />
-          </View>
-
-          {/* Confirm Password Input */}
-          <View className="mb-6">
-            <Text className="text-sm font-semibold mb-2 text-[#1a1a1a]">
-              Confirm Password
-            </Text>
-            <TextInput
-              placeholder="Re-enter your password"
-              placeholderTextColor="#aaa"
-              secureTextEntry
-              className="border-2 border-[#e0e0e0] bg-[#f9f8f6] p-4 rounded-2xl text-base"
-              value={conPassword}
-              onChangeText={setConPassword}
-              editable={!isLoading}
-            />
-          </View>
-
-          {/* Register Button */}
-          <Pressable
-            onPress={handleRegister}
-            disabled={isLoading}
-            className="py-4 rounded-2xl flex-row justify-center items-center bg-[#c97a52]"
-            style={{ opacity: isLoading ? 0.7 : 1 }}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text className="text-white text-lg font-bold">Create Account</Text>
-            )}
-          </Pressable>
-
-          {/* Divider */}
-          <View className="flex-row items-center my-6">
-            <View className="flex-1 h-[1px] bg-[#e0e0e0]" />
-            <Text className="mx-3 text-[#999]">OR</Text>
-            <View className="flex-1 h-[1px] bg-[#e0e0e0]" />
-          </View>
-
-          {/* Login Link */}
-          <View className="flex-row justify-center items-center">
-            <Text className="text-[#666]">Already have an account? </Text>
-            <TouchableOpacity onPress={() => router.back()} disabled={isLoading}>
-              <Text className="font-bold text-[#c97a52]">Login</Text>
-            </TouchableOpacity>
-          </View>
+        {/* Name */}
+        <View className="flex-row items-center bg-white border border-white/20 p-4 mb-4 rounded-2xl">
+          <Feather name="user" size={18} color="#3b524391" className="mr-2" />
+          <TextInput
+            placeholder="Full Name"
+            className="flex-1 text-black p-0"
+            placeholderTextColor="#3b524391"
+            value={name}
+            onChangeText={setName}
+          />
         </View>
 
-        {/* Terms Text */}
-        <Text className="text-center text-xs mt-6 text-[#999] px-5" style={{ lineHeight: 18 }}>
-          By creating an account, you agree to our{" "}
-          <Text className="font-semibold text-[#1a1a1a]">Terms of Service</Text>
-          {" "}and{" "}
-          <Text className="font-semibold text-[#1a1a1a]">Privacy Policy</Text>
-        </Text>
-      </View>
+        {/* Email */}
+        <View className="flex-row items-center bg-white border border-white/20 p-4 mb-4 rounded-2xl">
+          <Feather name="mail" size={18} color="#3b524391" className="mr-2" />
+          <TextInput
+            placeholder="Email"
+            autoCapitalize="none"
+            keyboardType="email-address"
+            className="flex-1 text-black p-0"
+            placeholderTextColor="#3b524391"
+            value={email}
+            onChangeText={setEmail}
+          />
+        </View>
+
+        {/* Password */}
+        <View className="flex-row items-center bg-white border border-white/20 p-4 mb-4 rounded-2xl">
+          <Feather name="lock" size={18} color="#3b524391" className="mr-2" />
+          <TextInput
+            placeholder="Password"
+            secureTextEntry
+            className="flex-1 text-black p-0"
+            placeholderTextColor="#3b524391"
+            value={password}
+            onChangeText={setPassword}
+          />
+        </View>
+
+        {/* Confirm Password */}
+        <View className="flex-row items-center bg-white border border-white/20 p-4 mb-6 rounded-2xl">
+          <Feather name="lock" size={18} color="#3b524391" className="mr-2" />
+          <TextInput
+            placeholder="Confirm Password"
+            secureTextEntry
+            className="flex-1 text-black p-0"
+            placeholderTextColor="#3b524391"
+            value={conPassword}
+            onChangeText={setConPassword}
+          />
+        </View>
+
+        {/* Register Button */}
+        <Pressable onPress={handleRegister}>
+          <LinearGradient colors={["#1b2921", "#1b2921"]} className="py-4 rounded-2xl">
+            <Text className="text-white text-lg font-semibold text-center">
+              Create Account
+            </Text>
+          </LinearGradient>
+        </Pressable>
+
+        {/* OR */}
+        <View className="flex-row items-center my-6">
+          <View className="flex-1 h-[1px] bg-white/30" />
+          <Text className="mx-3 text-emerald-200">OR</Text>
+          <View className="flex-1 h-[1px] bg-white/30" />
+        </View>
+
+        {/* Google Register */}
+        <Pressable
+          onPress={() => promptAsync()}
+          className="flex-row items-center justify-center py-4 rounded-2xl bg-black/90"
+        >
+          <Image
+            source={require("../../assets/google.png")}
+            style={{ width: 22, height: 22, marginRight: 10 }}
+            resizeMode="contain"
+          />
+          <Text className="text-white font-semibold text-base">
+            Continue with Google
+          </Text>
+        </Pressable>
+
+        {/* Login */}
+        <View className="flex-row justify-center mt-8">
+          <Text className="text-emerald-100">Already have an account? </Text>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Text className="text-emerald-300 font-bold">Login</Text>
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
     </ScrollView>
   )
 }

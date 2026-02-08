@@ -35,7 +35,7 @@ const Login = () => {
   });
 
   if (!fontsLoaded) {
-    return null; 
+    return null;
   }
 
 
@@ -69,24 +69,38 @@ const Login = () => {
         <Image
           source={require("../../assets/bazaaro.png")}
           style={{
-            width: 200,
-            height: 60,
+            width: 100,
+            height: 30,
             alignSelf: "center",
             marginBottom: 8
           }}
           resizeMode="contain"
         />
-        <Text
-          style={{
-            fontFamily: "Poppins_700Bold", 
-            fontSize: 15,                  
-            color: "#0F1A14",              
-            textAlign: "center",          
-            marginBottom: 20,
-          }}
-        >
-          Buy Local, Sell Simple
-        </Text>
+        <View style={{ marginBottom: 20 }}>
+          <Text
+            style={{
+              fontFamily: "Poppins_700Bold",
+              fontSize: 32,
+              color: "#ffffff",
+              textAlign: "center",
+            }}
+          >
+            Hello Again!
+          </Text>
+
+          <Text
+            style={{
+              fontSize: 14,
+              color: "#ffffffa8",
+              textAlign: "center",
+              marginTop: 3,
+              opacity: 0.8,
+            }}
+          >
+            welcome Back You’ve Been Missed!
+          </Text>
+        </View>
+
 
         {/* Email */}
         <View className="flex-row items-center bg-white border border-white/20 p-4 mb-4 rounded-2xl">
@@ -95,7 +109,7 @@ const Login = () => {
             placeholder="Email"
             autoCapitalize="none"
             keyboardType="email-address"
-            className="flex-1 text-black p-0" 
+            className="flex-1 text-black p-0"
             placeholderTextColor="#3b524391"
             value={email}
             onChangeText={setEmail}
@@ -108,7 +122,7 @@ const Login = () => {
           <TextInput
             placeholder="Password"
             secureTextEntry
-            className="flex-1 text-black p-0" 
+            className="flex-1 text-black p-0"
             placeholderTextColor="#3b524391"
             value={password}
             onChangeText={setPassword}
