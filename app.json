@@ -2,6 +2,7 @@
   "expo": {
     "name": "bazaaro",
     "slug": "bazaaro",
+    "owner": "ireshchathuranga",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
