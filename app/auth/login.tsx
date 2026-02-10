@@ -64,7 +64,7 @@ const Login = () => {
             position: "top",
             visibilityTime: 2000,
           })
-          setTimeout(() => router.replace("/tabs/home"), 500)
+          setTimeout(() => router.replace("/tabs/profile"), 500)
         })
         .catch((error) => {
           Toast.show({
@@ -111,7 +111,7 @@ const Login = () => {
         position: "top",
         visibilityTime: 2000,
       })
-      setTimeout(() => router.replace("/tabs/home"), 500)
+      setTimeout(() => router.replace("/tabs/profile"), 500)
     } catch (e: any) {
       console.error("Login error:", e)
       Toast.show({
