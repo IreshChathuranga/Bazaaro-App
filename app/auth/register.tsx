@@ -4,14 +4,12 @@ import {
   TextInput,
   Pressable,
   TouchableOpacity,
-  Alert,
   ScrollView,
   Image
 } from "react-native"
 import React, { useState, useEffect } from "react"
 import { useRouter } from "expo-router"
 import { LinearGradient } from "expo-linear-gradient"
-import { useLoader } from "@/hooks/useLoader"
 import { registerUser } from "@/services/authService"
 import * as Google from "expo-auth-session/providers/google"
 import { useFonts, Poppins_700Bold } from "@expo-google-fonts/poppins"
@@ -19,12 +17,12 @@ import { Feather } from "@expo/vector-icons"
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth"
 import { auth } from "@/services/firebase"
 import * as WebBrowser from "expo-web-browser"
+import Toast from "react-native-toast-message"
 
 WebBrowser.maybeCompleteAuthSession()
 
 const Register = () => {
   const router = useRouter()
-  const { showLoader, hideLoader } = useLoader()
 
   const [fontsLoaded] = useFonts({ Poppins_700Bold })
   const [name, setName] = useState("")
@@ -44,24 +42,46 @@ const Register = () => {
       const accessToken = response.authentication?.accessToken
 
       if (!idToken) {
-        Alert.alert("Google Login Failed", "Missing ID token")
+        Toast.show({
+          type: "error",
+          text1: "Google Login Failed",
+          text2: "Missing ID token",
+          position: "top",
+          visibilityTime: 3000,
+        })
         return
       }
 
       const credential = GoogleAuthProvider.credential(idToken, accessToken)
 
-      showLoader()
       signInWithCredential(auth, credential)
         .then(() => {
-          hideLoader()
-          router.replace("/tabs/home")
+          Toast.show({
+            type: "success",
+            text1: "Welcome! 🎉",
+            text2: "Successfully signed in with Google",
+            position: "top",
+            visibilityTime: 2000,
+          })
+          setTimeout(() => router.replace("/tabs/home"), 500)
         })
         .catch((error) => {
-          hideLoader()
-          Alert.alert("Google Login Failed", error.message)
+          Toast.show({
+            type: "error",
+            text1: "Google Login Failed",
+            text2: error.message,
+            position: "top",
+            visibilityTime: 4000,
+          })
         })
     } else if (response?.type === "error") {
-      Alert.alert("Authentication Error", response.error?.message || "Something went wrong")
+      Toast.show({
+        type: "error",
+        text1: "Authentication Error",
+        text2: response.error?.message || "Something went wrong",
+        position: "top",
+        visibilityTime: 4000,
+      })
     }
   }, [response])
 
@@ -69,23 +89,56 @@ const Register = () => {
 
   const handleRegister = async () => {
     if (!name || !email || !password || !conPassword) {
-      Alert.alert("Please fill all fields")
+      Toast.show({
+        type: "error",
+        text1: "Missing Information",
+        text2: "Please fill all fields",
+        position: "top",
+        visibilityTime: 3000,
+      })
       return
     }
 
     if (password !== conPassword) {
-      Alert.alert("Passwords do not match")
+      Toast.show({
+        type: "error",
+        text1: "Password Mismatch",
+        text2: "Passwords do not match",
+        position: "top",
+        visibilityTime: 3000,
+      })
       return
     }
 
-    showLoader()
+    if (password.length < 6) {
+      Toast.show({
+        type: "error",
+        text1: "Weak Password",
+        text2: "Password must be at least 6 characters",
+        position: "top",
+        visibilityTime: 3000,
+      })
+      return
+    }
+
     try {
       await registerUser(name, email, password)
-      router.replace("/tabs/home")
-    } catch (e) {
-      Alert.alert("Registration failed")
-    } finally {
-      hideLoader()
+      Toast.show({
+        type: "success",
+        text1: "Account Created! 🎉",
+        text2: "Welcome to Bazaaro",
+        position: "top",
+        visibilityTime: 2000,
+      })
+      setTimeout(() => router.replace("/tabs/home"), 500)
+    } catch (e: any) {
+      Toast.show({
+        type: "error",
+        text1: "Registration Failed",
+        text2: e.message || "Something went wrong",
+        position: "top",
+        visibilityTime: 4000,
+      })
     }
   }
 
@@ -113,25 +166,53 @@ const Register = () => {
         {/* Name */}
         <View className="flex-row items-center bg-white border border-white/20 p-4 mb-4 rounded-2xl">
           <Feather name="user" size={18} color="#3b524391" className="mr-2" />
-          <TextInput placeholder="Full Name" className="flex-1 text-black p-0" placeholderTextColor="#3b524391" value={name} onChangeText={setName} />
+          <TextInput 
+            placeholder="Full Name" 
+            className="flex-1 text-black p-0" 
+            placeholderTextColor="#3b524391" 
+            value={name} 
+            onChangeText={setName} 
+          />
         </View>
 
         {/* Email */}
         <View className="flex-row items-center bg-white border border-white/20 p-4 mb-4 rounded-2xl">
           <Feather name="mail" size={18} color="#3b524391" className="mr-2" />
-          <TextInput placeholder="Email" autoCapitalize="none" keyboardType="email-address" className="flex-1 text-black p-0" placeholderTextColor="#3b524391" value={email} onChangeText={setEmail} />
+          <TextInput 
+            placeholder="Email" 
+            autoCapitalize="none" 
+            keyboardType="email-address" 
+            className="flex-1 text-black p-0" 
+            placeholderTextColor="#3b524391" 
+            value={email} 
+            onChangeText={setEmail} 
+          />
         </View>
 
         {/* Password */}
         <View className="flex-row items-center bg-white border border-white/20 p-4 mb-4 rounded-2xl">
           <Feather name="lock" size={18} color="#3b524391" className="mr-2" />
-          <TextInput placeholder="Password" secureTextEntry className="flex-1 text-black p-0" placeholderTextColor="#3b524391" value={password} onChangeText={setPassword} />
+          <TextInput 
+            placeholder="Password" 
+            secureTextEntry 
+            className="flex-1 text-black p-0" 
+            placeholderTextColor="#3b524391" 
+            value={password} 
+            onChangeText={setPassword} 
+          />
         </View>
 
         {/* Confirm Password */}
         <View className="flex-row items-center bg-white border border-white/20 p-4 mb-6 rounded-2xl">
           <Feather name="lock" size={18} color="#3b524391" className="mr-2" />
-          <TextInput placeholder="Confirm Password" secureTextEntry className="flex-1 text-black p-0" placeholderTextColor="#3b524391" value={conPassword} onChangeText={setConPassword} />
+          <TextInput 
+            placeholder="Confirm Password" 
+            secureTextEntry 
+            className="flex-1 text-black p-0" 
+            placeholderTextColor="#3b524391" 
+            value={conPassword} 
+            onChangeText={setConPassword} 
+          />
         </View>
 
         {/* Register Button */}
@@ -154,7 +235,11 @@ const Register = () => {
           disabled={!request}
           className="flex-row items-center justify-center py-4 rounded-2xl bg-black/90"
         >
-          <Image source={require("../../assets/google.png")} style={{ width: 22, height: 22, marginRight: 10 }} resizeMode="contain" />
+          <Image 
+            source={require("../../assets/google.png")} 
+            style={{ width: 22, height: 22, marginRight: 10 }} 
+            resizeMode="contain" 
+          />
           <Text className="text-white font-semibold text-base">Continue with Google</Text>
         </Pressable>
 

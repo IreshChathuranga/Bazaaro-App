@@ -4,54 +4,123 @@ import {
   TextInput,
   Pressable,
   TouchableOpacity,
-  Alert,
-  ScrollView
+  ScrollView,
+  Image
 } from "react-native"
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useRouter } from "expo-router"
 import { LinearGradient } from "expo-linear-gradient"
-import { useLoader } from "@/hooks/useLoader"
 import { login } from "@/services/authService"
 import * as Google from "expo-auth-session/providers/google"
-import { useFonts, Poppins_700Bold } from '@expo-google-fonts/poppins';
-import { Image } from "react-native"
-import { Feather } from "@expo/vector-icons";
+import { useFonts, Poppins_700Bold } from '@expo-google-fonts/poppins'
+import { Feather } from "@expo/vector-icons"
+import { GoogleAuthProvider, signInWithCredential } from "firebase/auth"
+import { auth } from "@/services/firebase"
+import * as WebBrowser from "expo-web-browser"
+import Toast from "react-native-toast-message"
 
-
+WebBrowser.maybeCompleteAuthSession()
 
 const Login = () => {
   const router = useRouter()
-  const { showLoader, hideLoader, isLoading } = useLoader()
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: "YOUR_GOOGLE_CLIENT_ID"
-  })
-
   const [fontsLoaded] = useFonts({
     Poppins_700Bold,
-  });
+  })
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+  })
+
+  useEffect(() => {
+    if (response?.type === "success") {
+      const idToken = response.authentication?.idToken
+      const accessToken = response.authentication?.accessToken
+
+      if (!idToken) {
+        Toast.show({
+          type: "error",
+          text1: "Google Login Failed",
+          text2: "Missing ID token",
+          position: "top",
+          visibilityTime: 3000,
+        })
+        return
+      }
+
+      const credential = GoogleAuthProvider.credential(idToken, accessToken)
+
+      signInWithCredential(auth, credential)
+        .then(() => {
+          Toast.show({
+            type: "success",
+            text1: "Welcome Back! 🎉",
+            text2: "Successfully signed in with Google",
+            position: "top",
+            visibilityTime: 2000,
+          })
+          setTimeout(() => router.replace("/tabs/home"), 500)
+        })
+        .catch((error) => {
+          Toast.show({
+            type: "error",
+            text1: "Google Login Failed",
+            text2: error.message,
+            position: "top",
+            visibilityTime: 4000,
+          })
+        })
+    } else if (response?.type === "error") {
+      Toast.show({
+        type: "error",
+        text1: "Authentication Error",
+        text2: response.error?.message || "Something went wrong",
+        position: "top",
+        visibilityTime: 4000,
+      })
+    }
+  }, [response])
 
   if (!fontsLoaded) {
-    return null;
+    return null
   }
 
-
   const handleLogin = async () => {
-    if (!email || !password || isLoading) {
-      Alert.alert("Please enter email and password")
+    if (!email || !password) {
+      Toast.show({
+        type: "error",
+        text1: "Missing Information",
+        text2: "Please enter email and password",
+        position: "top",
+        visibilityTime: 3000,
+      })
       return
     }
 
-    showLoader()
     try {
       await login(email, password)
-    } catch (e) {
-      Alert.alert("Login fail")
-    } finally {
-      hideLoader()
+      Toast.show({
+        type: "success",
+        text1: "Welcome Back! 🎉",
+        text2: "Successfully logged in",
+        position: "top",
+        visibilityTime: 2000,
+      })
+      setTimeout(() => router.replace("/tabs/home"), 500)
+    } catch (e: any) {
+      console.error("Login error:", e)
+      Toast.show({
+        type: "error",
+        text1: "Login Failed",
+        text2: e.message || "Invalid email or password",
+        position: "top",
+        visibilityTime: 4000,
+      })
     }
   }
 
@@ -64,8 +133,7 @@ const Login = () => {
         colors={["#0F1A14", "#2F4F3A", "#5B7F5A", "#9c9c9c"]}
         className="flex-1 justify-center px-6"
       >
-
-        {/* Title */}
+        {/* Logo */}
         <Image
           source={require("../../assets/bazaaro.png")}
           style={{
@@ -97,10 +165,9 @@ const Login = () => {
               opacity: 0.8,
             }}
           >
-            welcome Back You’ve Been Missed!
+            Welcome Back You've Been Missed!
           </Text>
         </View>
-
 
         {/* Email */}
         <View className="flex-row items-center bg-white border border-white/20 p-4 mb-4 rounded-2xl">
@@ -129,7 +196,6 @@ const Login = () => {
           />
         </View>
 
-
         {/* Sign In */}
         <Pressable onPress={handleLogin}>
           <LinearGradient
@@ -152,6 +218,7 @@ const Login = () => {
         {/* Google */}
         <Pressable
           onPress={() => promptAsync()}
+          disabled={!request}
           className="flex-row items-center justify-center py-4 rounded-2xl bg-black/90"
         >
           <Image
@@ -164,7 +231,6 @@ const Login = () => {
           </Text>
         </Pressable>
 
-
         {/* Register */}
         <View className="flex-row justify-center mt-8">
           <Text className="text-emerald-100">New to Bazaaro? </Text>
@@ -174,7 +240,6 @@ const Login = () => {
             </Text>
           </TouchableOpacity>
         </View>
-
       </LinearGradient>
     </ScrollView>
   )
