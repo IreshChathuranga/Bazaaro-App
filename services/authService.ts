@@ -5,7 +5,7 @@ import {
   signOut
 } from "firebase/auth"
 import { auth, db } from "./firebase"
-import { doc, setDoc , serverTimestamp } from "firebase/firestore"
+import { doc, setDoc, serverTimestamp ,updateDoc } from "firebase/firestore"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export const login = async (email: string, password: string) => {
@@ -45,9 +45,20 @@ export const registerUser = async (
   }
 }
 
-
 export const logoutUser = async () => {
   await signOut(auth)
   AsyncStorage.clear()
   return
+}
+
+export const updateUserProfileImage = async (user: any, imageUrl: string) => {
+  await updateProfile(user, {
+    photoURL: imageUrl,
+  })
+
+  const userDocRef = doc(db, "users", user.uid)
+  await updateDoc(userDocRef, {
+    photoURL: imageUrl,
+    updatedAt: new Date()
+  })
 }

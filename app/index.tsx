@@ -38,7 +38,7 @@ export default function Index() {
 
   return (
     <LinearGradient
-      colors={["#ffffff", "#ffffff", "#ffffff"]}
+      colors={["#0d1812", "#0d1812", "#0d1812"]}
       style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
     >
       <View style={{ width: 300, height: 160, overflow: "hidden" }}>

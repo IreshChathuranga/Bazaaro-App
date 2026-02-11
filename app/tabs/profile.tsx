@@ -1,14 +1,54 @@
-'use client'
-
 import { View, Text, Pressable, Alert, ScrollView, Image } from "react-native"
-import React, { useContext } from "react"
+import React, { useContext, useState } from "react"
 import { AuthContext } from "@/context/AuthContext"
 import { logoutUser } from "@/services/authService"
 import { useRouter } from "expo-router"
 import { LinearGradient } from "expo-linear-gradient"
 import { Feather } from "@expo/vector-icons"
+import * as ImagePicker from "expo-image-picker"
+import { uploadImageToCloudinary } from "@/services/cloudinaryService"
+import { updateUserProfileImage } from "@/services/authService"
+import { useLoader } from "@/hooks/useLoader"
 
 const Profile = () => {
+  const [localImage, setLocalImage] = useState<string | null>(null)
+  const { showLoader, hideLoader } = useLoader()
+
+  const pickImageFromDevice = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync()
+    if (!permission.granted) {
+      alert("Permission required to access gallery")
+      return
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    })
+
+    if (!result.canceled && user) {
+      try {
+        showLoader()
+
+        const imageUri = result.assets[0].uri
+
+        const uploadedUrl = await uploadImageToCloudinary(imageUri)
+
+        await updateUserProfileImage(user, uploadedUrl)
+
+        setLocalImage(uploadedUrl)
+
+        Alert.alert("Success", "Profile image updated")
+      } catch (error) {
+        Alert.alert("Error", "Image upload failed")
+      } finally {
+        hideLoader()
+      }
+    }
+  }
+
   const { user } = useContext(AuthContext)
   const router = useRouter()
 
@@ -25,44 +65,70 @@ const Profile = () => {
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <LinearGradient
-        colors={["#0F1A14", "#2F4F3A", "#5B7F5A", "#9c9c9c"]}
+        colors={["#0d1812", "#0d1812", "#0d1812", "#0d1812"]}
         className="flex-1 px-6 pt-10"
       >
 
-        {/* Welcome Card */}
-        <View className="bg-white/10 border border-black/20 rounded-3xl p-6 mb-6">
-
-          {/* Header */}
-          <Pressable
-            onPress={() => router.replace("/tabs/dashboard")}
-            className="flex-row items-center justify-between mb-4"
-          >
-            <Text className="text-white text-lg font-semibold">
+        {/* Header Card */}
+        <Pressable
+          onPress={() => router.replace("/tabs/dashboard")}
+          className="border border-white rounded-[60px] px-3 py-5 mb-6"
+        >
+          <View className="flex-row items-center justify-between">
+            <Text className="text-white text-2xl font-semibold">
               My Profile
             </Text>
 
-            <Feather name="chevron-right" size={22} color="#A7F3D0" />
-          </Pressable>
+            {/* Arrow Circle */}
+            <View className="w-12 h-12 rounded-full bg-white/10 items-center justify-center">
+              <Feather name="chevron-right" size={26} color="#ffffff" />
+            </View>
+          </View>
+        </Pressable>
 
-          {/* Logo */}
-          <Image
-            source={require("../../assets/bazaaro.png")}
-            style={{ width: 110, height: 32, alignSelf: "center", marginBottom: 16 }}
-            resizeMode="contain"
-          />
 
-          <Text className="text-black text-xl font-bold mb-2">
-            Welcome back 👋
-          </Text>
+        {/* Welcome Card */}
+        <View className="bg-white/5 border border-white/10 rounded-3xl p-6 mb-6">
+          <View className="flex-row items-center justify-between">
 
-          <Text className="text-green-400 text-lg font-semibold">
-            {user?.displayName || "Bazaaro User"}
-          </Text>
+            {/* Left Side */}
+            <View className="flex-1 pr-4">
+              <Text className="text-white text-xl font-bold mb-1">
+                Welcome back 👋
+              </Text>
 
-          <Text className="text-black/70 text-sm mt-2">
-            Discover great local deals around you
-          </Text>
+              <Text className="text-green-500 text-lg font-semibold">
+                {user?.displayName || "Bazaaro User"}
+              </Text>
+
+              <Text className="text-white/20 text-sm mt-1">
+                Discover great local deals around you
+              </Text>
+            </View>
+
+            {/* Right Side - Profile Image */}
+            <Pressable onPress={pickImageFromDevice}>
+              <Image
+                source={{
+                  uri:
+                    localImage ||
+                    user?.photoURL ||
+                    "https://ui-avatars.com/api/?name=Bazaaro&background=0F1A14&color=fff",
+                }}
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: 32,
+                  borderWidth: 2,
+                  borderColor: "#10B981", // emerald
+                }}
+              />
+            </Pressable>
+
+          </View>
         </View>
+
+
 
         {/* Quick Actions */}
         <View className="mb-6">
@@ -71,14 +137,16 @@ const Profile = () => {
           </Text>
 
           <View className="flex-row gap-3">
-            <Pressable className="flex-1 bg-white/15 border border-white/20 rounded-2xl p-4 items-center">
-              <Text className="text-emerald-200 font-semibold">
+            <Pressable className="flex-1 bg-green-500 rounded-[60px] p-4 items-center"
+              onPress={() => router.push("/tabs/dashboard")} >
+              <Text className="text-white font-semibold">
                 Browse Items
               </Text>
             </Pressable>
 
-            <Pressable className="flex-1 bg-white/15 border border-white/20 rounded-2xl p-4 items-center">
-              <Text className="text-emerald-200 font-semibold">
+            <Pressable className="flex-1 bg-green-500 rounded-[60px] p-4 items-center"
+              onPress={() => router.push("/tabs/post")} >
+              <Text className="text-white font-semibold">
                 Sell Item
               </Text>
             </Pressable>
@@ -86,7 +154,7 @@ const Profile = () => {
         </View>
 
         {/* Account Info */}
-        <View className="bg-white/10 border border-white/20 rounded-2xl p-5 mb-8">
+        <View className="bg-white/5 border border-white/10 rounded-2xl p-5 mb-8">
           <Text className="text-white/70 text-sm mb-1">
             Account Email
           </Text>
@@ -104,7 +172,7 @@ const Profile = () => {
         {/* Logout */}
         <Pressable
           onPress={handleLogout}
-          className="bg-red-500/90 py-4 rounded-2xl mb-10"
+          className="bg-red-500/90 py-4 rounded-[60px] mb-10"
         >
           <Text className="text-white text-lg font-semibold text-center">
             Sign Out

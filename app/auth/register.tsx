@@ -164,52 +164,52 @@ const Register = () => {
         </View>
 
         {/* Name */}
-        <View className="flex-row items-center bg-white border border-white/20 p-4 mb-4 rounded-2xl">
-          <Feather name="user" size={18} color="#3b524391" className="mr-2" />
+        <View className="flex-row items-center bg-white/10 border border-white/20 p-4 mb-4 rounded-2xl">
+          <Feather name="user" size={18} color="#abb1ad91" className="mr-2" />
           <TextInput 
             placeholder="Full Name" 
             className="flex-1 text-black p-0" 
-            placeholderTextColor="#3b524391" 
+            placeholderTextColor="#abb1ad91" 
             value={name} 
             onChangeText={setName} 
           />
         </View>
 
         {/* Email */}
-        <View className="flex-row items-center bg-white border border-white/20 p-4 mb-4 rounded-2xl">
-          <Feather name="mail" size={18} color="#3b524391" className="mr-2" />
+        <View className="flex-row items-center bg-white/10 border border-white/20 p-4 mb-4 rounded-2xl">
+          <Feather name="mail" size={18} color="#abb1ad91" className="mr-2" />
           <TextInput 
             placeholder="Email" 
             autoCapitalize="none" 
             keyboardType="email-address" 
             className="flex-1 text-black p-0" 
-            placeholderTextColor="#3b524391" 
+            placeholderTextColor="#abb1ad91" 
             value={email} 
             onChangeText={setEmail} 
           />
         </View>
 
         {/* Password */}
-        <View className="flex-row items-center bg-white border border-white/20 p-4 mb-4 rounded-2xl">
-          <Feather name="lock" size={18} color="#3b524391" className="mr-2" />
+        <View className="flex-row items-center bg-white/10 border border-white/20 p-4 mb-4 rounded-2xl">
+          <Feather name="lock" size={18} color="#abb1ad91" className="mr-2" />
           <TextInput 
             placeholder="Password" 
             secureTextEntry 
             className="flex-1 text-black p-0" 
-            placeholderTextColor="#3b524391" 
+            placeholderTextColor="#abb1ad91" 
             value={password} 
             onChangeText={setPassword} 
           />
         </View>
 
         {/* Confirm Password */}
-        <View className="flex-row items-center bg-white border border-white/20 p-4 mb-6 rounded-2xl">
-          <Feather name="lock" size={18} color="#3b524391" className="mr-2" />
+        <View className="flex-row items-center bg-white/10 border border-white/20 p-4 mb-6 rounded-2xl">
+          <Feather name="lock" size={18} color="#abb1ad91" className="mr-2" />
           <TextInput 
             placeholder="Confirm Password" 
             secureTextEntry 
             className="flex-1 text-black p-0" 
-            placeholderTextColor="#3b524391" 
+            placeholderTextColor="#abb1ad91" 
             value={conPassword} 
             onChangeText={setConPassword} 
           />
