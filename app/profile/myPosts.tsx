@@ -8,11 +8,11 @@ import { getCategoryPostCounts } from "@/services/postService"
 import type { Href } from "expo-router"
 
 const categories = [
-  { name: "Cars", icon: "🚗", color: "#3b82f6", route: "cars" },
-  { name: "Motorbikes", icon: "🏍️", color: "#8b5cf6", route: "motorbikes" },
-  { name: "Phones", icon: "📱", color: "#06b6d4", route: "phones" },
-  { name: "Arts", icon: "🎨", color: "#f59e0b", route: "arts" },
-  { name: "Property", icon: "🏠", color: "#10b981", route: "property" },
+  { name: "Cars", icon: "🚗", color: "#3b82f6", route: "postedCars" },
+  { name: "Motorbikes", icon: "🏍️", color: "#8b5cf6", route: "postedBikes" },
+  { name: "Phones", icon: "📱", color: "#06b6d4", route: "postedPhones" },
+  { name: "Arts", icon: "🎨", color: "#f59e0b", route: "postedArts" },
+  { name: "Property", icon: "🏠", color: "#10b981", route: "postedProperty" },
 ]
 
 const MyPosts = () => {
@@ -53,7 +53,7 @@ const MyPosts = () => {
         className="flex-1 px-6 pt-10"
       >
         <Pressable
-          onPress={() => router.back()}
+          onPress={() => router.replace("/tabs/profile" as Href)}
           className="border border-white rounded-[60px] px-3 py-5 mb-6"
         >
           <View className="flex-row items-center justify-between">

@@ -126,7 +126,7 @@ const ArtsPost = () => {
         position: "top",
         visibilityTime: 2000,
       })
-      setTimeout(() => router.replace("/tabs/dashboard"), 1000)
+      setTimeout(() => router.replace("/tabs/post"), 1000)
     } catch (error) {
       hideLoader()
       Toast.show({
@@ -146,7 +146,7 @@ const ArtsPost = () => {
         className="flex-1 px-6 pt-10"
       >
         <Pressable
-          onPress={() => router.back()}
+          onPress={() => router.replace("/tabs/post")}
           className="border border-white rounded-[60px] px-3 py-5 mb-6"
         >
           <View className="flex-row items-center justify-between">
