@@ -137,3 +137,40 @@ export const getCategoryPostCounts = async (userId: string) => {
     throw error
   }
 }
+
+// Add this function to your existing postService.ts
+
+export const getAllPosts = async (): Promise<PostWithId[]> => {
+  try {
+    const q = query(
+      collection(db, "posts"),
+      where("status", "==", "active")
+    )
+    const querySnapshot = await getDocs(q)
+    return querySnapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...(doc.data() as PostData) 
+    }))
+  } catch (error) {
+    console.error("Error fetching all posts:", error)
+    throw error
+  }
+}
+
+export const getPostsByCategory = async (category: string): Promise<PostWithId[]> => {
+  try {
+    const q = query(
+      collection(db, "posts"),
+      where("status", "==", "active"),
+      where("category", "==", category)
+    )
+    const querySnapshot = await getDocs(q)
+    return querySnapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      ...(doc.data() as PostData) 
+    }))
+  } catch (error) {
+    console.error("Error fetching posts by category:", error)
+    throw error
+  }
+}

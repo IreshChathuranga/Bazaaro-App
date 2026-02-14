@@ -2,12 +2,12 @@
 
 import { useRouter, type Href } from "expo-router";
 import React, { ReactNode, useState } from "react";
-import { Pressable, StyleSheet, Text, View, ScrollView, Platform } from "react-native";
+import { Pressable, Text, View, ScrollView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type LayoutProps = {
   children?: ReactNode;
-  showTabBar?: boolean; // New prop to control tab bar visibility
+  showTabBar?: boolean;
 };
 
 const Layout = ({ children, showTabBar = true }: LayoutProps) => {
@@ -20,118 +20,87 @@ const Layout = ({ children, showTabBar = true }: LayoutProps) => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView className="flex-1 bg-[#0d1812]" edges={['top']}>
       {/* Scrollable content */}
       <ScrollView 
-        contentContainerStyle={[
-          styles.content,
-          !showTabBar && { paddingBottom: 20 } // Less padding if no tab bar
-        ]}
+        contentContainerStyle={{ 
+          paddingBottom: showTabBar ? 90 : 20,
+          flexGrow: 1 
+        }}
         showsVerticalScrollIndicator={false}
       >
         {children}
       </ScrollView>
 
-      {/* Bottom Navigation - Only show if showTabBar is true */}
+      {/* Bottom Navigation */}
       {showTabBar && (
-        <View style={styles.bottomNavContainer}>
-          <Pressable style={styles.navItem} onPress={() => navigate("home", "/tabs/dashboard")}>
-            <Text style={styles.navIcon}>🏠</Text>
-            <Text style={[styles.navLabel, activeTab === "home" && styles.activeLabel]}>Home</Text>
+        <View 
+          className="absolute bottom-0 left-0 right-0 flex-row justify-around items-center bg-[#0d1812] border-t border-white/10"
+          style={{ 
+            paddingVertical: 8,
+            paddingBottom: Platform.OS === "ios" ? 20 : 8,
+            elevation: 20,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: -4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+          }}
+        >
+          <Pressable 
+            className="items-center px-3 py-2"
+            onPress={() => navigate("home", "/tabs/dashboard")}
+          >
+            <Text className="text-2xl mb-1">🏠</Text>
+            <Text className={`text-[10px] font-medium ${activeTab === "home" ? "text-green-500" : "text-white/50"}`}>
+              Home
+            </Text>
           </Pressable>
 
-          <Pressable style={styles.navItem} onPress={() => navigate("search", "/tabs/search")}>
-            <Text style={styles.navIcon}>🔍</Text>
-            <Text style={[styles.navLabel, activeTab === "search" && styles.activeLabel]}>Search</Text>
+          <Pressable 
+            className="items-center px-3 py-2"
+            onPress={() => navigate("search", "/tabs/search")}
+          >
+            <Text className="text-2xl mb-1">🔍</Text>
+            <Text className={`text-[10px] font-medium ${activeTab === "search" ? "text-green-500" : "text-white/50"}`}>
+              Search
+            </Text>
           </Pressable>
 
-          <Pressable style={styles.postButton} onPress={() => navigate("post", "/tabs/post")}>
-            <Text style={styles.postIcon}>+</Text>
-            <Text style={[styles.navLabel, activeTab === "post" && styles.activeLabel]}>Post Ad</Text>
+          <Pressable 
+            className="items-center justify-center -mt-6"
+            onPress={() => navigate("post", "/tabs/post")}
+          >
+            <View className="w-14 h-14 bg-green-500 rounded-full items-center justify-center mb-1 shadow-lg">
+              <Text className="text-white text-3xl font-bold" style={{ lineHeight: 56 }}>+</Text>
+            </View>
+            <Text className={`text-[10px] font-medium ${activeTab === "post" ? "text-green-500" : "text-white/50"}`}>
+              Post
+            </Text>
           </Pressable>
 
-          <Pressable style={styles.navItem} onPress={() => navigate("chat", "/tabs/chat")}>
-            <Text style={styles.navIcon}>💬</Text>
-            <Text style={[styles.navLabel, activeTab === "chat" && styles.activeLabel]}>Chat</Text>
+          <Pressable 
+            className="items-center px-3 py-2"
+            onPress={() => navigate("chat", "/tabs/chat")}
+          >
+            <Text className="text-2xl mb-1">💬</Text>
+            <Text className={`text-[10px] font-medium ${activeTab === "chat" ? "text-green-500" : "text-white/50"}`}>
+              Chat
+            </Text>
           </Pressable>
 
-          <Pressable style={styles.navItem} onPress={() => navigate("account", "/tabs/profile")}>
-            <Text style={styles.navIcon}>👤</Text>
-            <Text style={[styles.navLabel, activeTab === "account" && styles.activeLabel]}>Account</Text>
+          <Pressable 
+            className="items-center px-3 py-2"
+            onPress={() => navigate("account", "/tabs/profile")}
+          >
+            <Text className="text-2xl mb-1">👤</Text>
+            <Text className={`text-[10px] font-medium ${activeTab === "account" ? "text-green-500" : "text-white/50"}`}>
+              Account
+            </Text>
           </Pressable>
         </View>
       )}
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f3f4f6",
-  },
-  content: {
-    paddingBottom: 90,
-    flexGrow: 1,
-  },
-  bottomNavContainer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    paddingVertical: 10,
-    paddingBottom: Platform.OS === "ios" ? 20 : 10,
-    borderTopWidth: 1,
-    borderTopColor: "#d1d5db",
-    backgroundColor: "#fff",
-    elevation: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-  },
-  navItem: { 
-    alignItems: "center",
-    padding: 8,
-  },
-  navIcon: { 
-    fontSize: 24,
-    marginBottom: 4,
-  },
-  navLabel: { 
-    fontSize: 11, 
-    color: "#6b7280",
-    fontWeight: "500",
-  },
-  activeLabel: { 
-    color: "#10b981", 
-    fontWeight: "bold" 
-  },
-  postButton: { 
-    alignItems: "center", 
-    justifyContent: "center",
-    marginTop: -10,
-  },
-  postIcon: {
-    fontSize: 32,
-    fontWeight: "bold",
-    backgroundColor: "#10b981",
-    width: 56,
-    height: 56,
-    textAlign: "center",
-    lineHeight: 56,
-    borderRadius: 28,
-    color: "#fff",
-    marginBottom: 4,
-    elevation: 4,
-    shadowColor: "#10b981",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-  },
-});
 
 export default Layout;
