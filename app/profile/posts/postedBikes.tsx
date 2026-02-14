@@ -68,7 +68,7 @@ const MotorbikesPostsList = () => {
         className="flex-1 px-6 pt-10"
       >
         <Pressable
-          onPress={() => router.back()}
+          onPress={() => router.replace("/tabs/profile")}
           className="border border-white rounded-[60px] px-3 py-5 mb-6"
         >
           <View className="flex-row items-center justify-between">

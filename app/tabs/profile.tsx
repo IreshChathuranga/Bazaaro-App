@@ -149,7 +149,7 @@ const Profile = () => {
             Quick Actions
           </Text>
           <View className="flex-row gap-3">
-            <Pressable 
+            <Pressable
               className="flex-1 bg-green-500 rounded-[60px] p-4 items-center"
               onPress={() => router.push("/tabs/dashboard")}
             >
@@ -157,7 +157,7 @@ const Profile = () => {
                 Browse Items
               </Text>
             </Pressable>
-            <Pressable 
+            <Pressable
               className="flex-1 bg-green-500 rounded-[60px] p-4 items-center"
               onPress={() => router.push("/tabs/post")}
             >
@@ -184,6 +184,31 @@ const Profile = () => {
                 </Text>
                 <Text className="text-white/50 text-sm">
                   Manage your ads
+                </Text>
+              </View>
+            </View>
+            <View className="w-10 h-10 rounded-full bg-white/10 items-center justify-center">
+              <Feather name="chevron-right" size={20} color="#10b981" />
+            </View>
+          </View>
+        </Pressable>
+
+        {/* Profile Settings Button - NEW */}
+        <Pressable
+          onPress={() => router.push("/profile/settings")}
+          className="bg-white/5 border border-white/10 rounded-3xl p-6 mb-6"
+        >
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center flex-1">
+              <View className="w-12 h-12 rounded-full bg-blue-500/20 items-center justify-center mr-4">
+                <Feather name="settings" size={24} color="#3b82f6" />
+              </View>
+              <View>
+                <Text className="text-white text-lg font-semibold">
+                  Profile Settings
+                </Text>
+                <Text className="text-white/50 text-sm">
+                  Edit your information
                 </Text>
               </View>
             </View>

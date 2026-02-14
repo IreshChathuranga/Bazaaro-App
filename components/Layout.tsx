@@ -20,12 +20,12 @@ const Layout = ({ children, showTabBar = true }: LayoutProps) => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#0d1812]" edges={['top']}>
+    <SafeAreaView className="flex-1 bg-white/5" edges={['top']}>
       {/* Scrollable content */}
-      <ScrollView 
-        contentContainerStyle={{ 
+      <ScrollView
+        contentContainerStyle={{
           paddingBottom: showTabBar ? 90 : 20,
-          flexGrow: 1 
+          flexGrow: 1
         }}
         showsVerticalScrollIndicator={false}
       >
@@ -34,9 +34,9 @@ const Layout = ({ children, showTabBar = true }: LayoutProps) => {
 
       {/* Bottom Navigation */}
       {showTabBar && (
-        <View 
-          className="absolute bottom-0 left-0 right-0 flex-row justify-around items-center bg-[#0d1812] border-t border-white/10"
-          style={{ 
+        <View
+          className="absolute bottom-0 left-0 right-0 flex-row justify-around items-center bg-[#0a110d] border-t border-white/10"
+          style={{
             paddingVertical: 8,
             paddingBottom: Platform.OS === "ios" ? 20 : 8,
             elevation: 20,
@@ -44,9 +44,13 @@ const Layout = ({ children, showTabBar = true }: LayoutProps) => {
             shadowOffset: { width: 0, height: -4 },
             shadowOpacity: 0.3,
             shadowRadius: 8,
+
+            // 👇 Me deka add karanna
+            borderTopLeftRadius: 25,
+            borderTopRightRadius: 25,
           }}
         >
-          <Pressable 
+          <Pressable
             className="items-center px-3 py-2"
             onPress={() => navigate("home", "/tabs/dashboard")}
           >
@@ -56,7 +60,7 @@ const Layout = ({ children, showTabBar = true }: LayoutProps) => {
             </Text>
           </Pressable>
 
-          <Pressable 
+          <Pressable
             className="items-center px-3 py-2"
             onPress={() => navigate("search", "/tabs/search")}
           >
@@ -66,7 +70,7 @@ const Layout = ({ children, showTabBar = true }: LayoutProps) => {
             </Text>
           </Pressable>
 
-          <Pressable 
+          <Pressable
             className="items-center justify-center -mt-6"
             onPress={() => navigate("post", "/tabs/post")}
           >
@@ -78,7 +82,7 @@ const Layout = ({ children, showTabBar = true }: LayoutProps) => {
             </Text>
           </Pressable>
 
-          <Pressable 
+          <Pressable
             className="items-center px-3 py-2"
             onPress={() => navigate("chat", "/tabs/chat")}
           >
@@ -88,7 +92,7 @@ const Layout = ({ children, showTabBar = true }: LayoutProps) => {
             </Text>
           </Pressable>
 
-          <Pressable 
+          <Pressable
             className="items-center px-3 py-2"
             onPress={() => navigate("account", "/tabs/profile")}
           >
