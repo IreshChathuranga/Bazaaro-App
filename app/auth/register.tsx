@@ -7,19 +7,13 @@ import {
   ScrollView,
   Image
 } from "react-native"
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { useRouter } from "expo-router"
 import { LinearGradient } from "expo-linear-gradient"
 import { registerUser } from "@/services/authService"
-import * as Google from "expo-auth-session/providers/google"
 import { useFonts, Poppins_700Bold } from "@expo-google-fonts/poppins"
 import { Feather } from "@expo/vector-icons"
-import { GoogleAuthProvider, signInWithCredential } from "firebase/auth"
-import { auth } from "@/services/firebase"
-import * as WebBrowser from "expo-web-browser"
 import Toast from "react-native-toast-message"
-
-WebBrowser.maybeCompleteAuthSession()
 
 const Register = () => {
   const router = useRouter()
@@ -29,61 +23,6 @@ const Register = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [conPassword, setConPassword] = useState("")
-
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-  })
-
-  useEffect(() => {
-    if (response?.type === "success") {
-      const idToken = response.authentication?.idToken
-      const accessToken = response.authentication?.accessToken
-
-      if (!idToken) {
-        Toast.show({
-          type: "error",
-          text1: "Google Login Failed",
-          text2: "Missing ID token",
-          position: "top",
-          visibilityTime: 3000,
-        })
-        return
-      }
-
-      const credential = GoogleAuthProvider.credential(idToken, accessToken)
-
-      signInWithCredential(auth, credential)
-        .then(() => {
-          Toast.show({
-            type: "success",
-            text1: "Welcome! 🎉",
-            text2: "Successfully signed in with Google",
-            position: "top",
-            visibilityTime: 2000,
-          })
-          setTimeout(() => router.replace("/tabs/profile"), 500)
-        })
-        .catch((error) => {
-          Toast.show({
-            type: "error",
-            text1: "Google Login Failed",
-            text2: error.message,
-            position: "top",
-            visibilityTime: 4000,
-          })
-        })
-    } else if (response?.type === "error") {
-      Toast.show({
-        type: "error",
-        text1: "Authentication Error",
-        text2: response.error?.message || "Something went wrong",
-        position: "top",
-        visibilityTime: 4000,
-      })
-    }
-  }, [response])
 
   if (!fontsLoaded) return null
 
@@ -140,6 +79,16 @@ const Register = () => {
         visibilityTime: 4000,
       })
     }
+  }
+
+  const handleGooglePress = () => {
+    Toast.show({
+      type: "info",
+      text1: "Coming Soon!",
+      text2: "Google Sign-In will be available in a future update",
+      position: "top",
+      visibilityTime: 3000,
+    })
   }
 
   return (
@@ -229,11 +178,10 @@ const Register = () => {
           <View className="flex-1 h-[1px] bg-white/30" />
         </View>
 
-        {/* Google Register */}
+        {/* Google Button (Visual Only - Disabled) */}
         <Pressable 
-          onPress={() => promptAsync()} 
-          disabled={!request}
-          className="flex-row items-center justify-center py-4 rounded-2xl bg-black/90"
+          onPress={handleGooglePress}
+          className="flex-row items-center justify-center py-4 rounded-2xl bg-black"
         >
           <Image 
             source={require("../../assets/google.png")} 

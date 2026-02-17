@@ -32,9 +32,17 @@ const PostDetail = () => {
       
       if (fetchedPost) {
         setPost(fetchedPost)
-        // Load seller profile
-        const profile = await getUserProfile(fetchedPost.userId)
-        setSellerProfile(profile)
+        console.log("✅ Post loaded:", fetchedPost.title)
+        console.log("👤 Current user:", user?.uid)
+        console.log("🛒 Seller:", fetchedPost.userId)
+        
+        try {
+          const profile = await getUserProfile(fetchedPost.userId)
+          console.log("📞 Seller profile:", profile)
+          setSellerProfile(profile)
+        } catch (profileError) {
+          console.error("❌ Error loading seller profile:", profileError)
+        }
       } else {
         Toast.show({
           type: "error",
@@ -65,7 +73,6 @@ const PostDetail = () => {
     setCurrentImageIndex(slideIndex)
   }
 
-  // WhatsApp Contact
   const handleWhatsApp = () => {
     const phoneNumber = sellerProfile?.phone || sellerProfile?.mobile
     
@@ -73,14 +80,13 @@ const PostDetail = () => {
       Toast.show({
         type: "error",
         text1: "No Phone Number",
-        text2: "Seller hasn't added a phone number",
+        text2: "Seller hasn't added a phone number yet",
         position: "top",
         visibilityTime: 3000,
       })
       return
     }
 
-    // Remove all non-numeric characters and add country code if needed
     let cleanNumber = phoneNumber.replace(/\D/g, '')
     if (!cleanNumber.startsWith('94') && cleanNumber.startsWith('0')) {
       cleanNumber = '94' + cleanNumber.substring(1)
@@ -115,7 +121,6 @@ const PostDetail = () => {
       })
   }
 
-  // Phone Call
   const handleCall = () => {
     const phoneNumber = sellerProfile?.phone || sellerProfile?.mobile
     
@@ -123,7 +128,7 @@ const PostDetail = () => {
       Toast.show({
         type: "error",
         text1: "No Phone Number",
-        text2: "Seller hasn't added a phone number",
+        text2: "Seller hasn't added a phone number yet",
         position: "top",
         visibilityTime: 3000,
       })
@@ -158,7 +163,6 @@ const PostDetail = () => {
       })
   }
 
-  // SMS Message
   const handleMessage = () => {
     const phoneNumber = sellerProfile?.phone || sellerProfile?.mobile
     
@@ -166,7 +170,7 @@ const PostDetail = () => {
       Toast.show({
         type: "error",
         text1: "No Phone Number",
-        text2: "Seller hasn't added a phone number",
+        text2: "Seller hasn't added a phone number yet",
         position: "top",
         visibilityTime: 3000,
       })
@@ -178,23 +182,21 @@ const PostDetail = () => {
       "Choose how you want to send a message",
       [
         {
-          text: "In-App Chat (Coming Soon)",
+          text: "📱 In-App Chat",
           onPress: () => {
             Toast.show({
               type: "info",
-              text1: "Coming Soon!",
+              text1: "Coming Soon! 🚀",
               text2: "In-app messaging will be available soon",
               position: "top",
               visibilityTime: 3000,
             })
-            // TODO: Navigate to in-app chat when implemented
-            // router.push(`/chat/${post?.userId}`)
           }
         },
         {
-          text: "Phone SMS",
+          text: "💬 Phone SMS",
           onPress: () => {
-            const message = `Hi! I'm interested in your ${post?.title} on Bazaaro.`
+            const message = `Hi! I'm interested in your ${post?.title} on Bazaaro (LKR ${post?.price?.toLocaleString()}).`
             const separator = Platform.OS === 'ios' ? '&' : '?'
             const url = `sms:${phoneNumber}${separator}body=${encodeURIComponent(message)}`
             
@@ -203,7 +205,7 @@ const PostDetail = () => {
               Toast.show({
                 type: "error",
                 text1: "Error",
-                text2: "Could not open messages",
+                text2: "Could not open messages app",
                 position: "top",
                 visibilityTime: 3000,
               })
@@ -214,7 +216,8 @@ const PostDetail = () => {
           text: "Cancel",
           style: "cancel"
         }
-      ]
+      ],
+      { cancelable: true }
     )
   }
 
@@ -231,13 +234,14 @@ const PostDetail = () => {
     return null
   }
 
+  const isOwnPost = user?.uid === post.userId
+
   return (
     <ScrollView className="flex-1 bg-[#0d1812]">
       <LinearGradient
         colors={["#0d1812", "#0d1812", "#0d1812"]}
         className="flex-1"
       >
-        {/* Image Carousel */}
         <View className="relative">
           <ScrollView
             horizontal
@@ -257,21 +261,19 @@ const PostDetail = () => {
                 </View>
               ))
             ) : (
-              <View className="w-full h-80 bg-white/10 justify-center items-center">
+              <View className="w-full h-80 bg-white/10 justify-center items-center" style={{ width: SCREEN_WIDTH }}>
                 <Feather name="image" size={60} color="#ffffff40" />
               </View>
             )}
           </ScrollView>
 
-          {/* Back Button */}
           <Pressable
-            onPress={() => router.back()}
+            onPress={() => router.replace("/tabs/dashboard")}
             className="absolute top-10 left-4 w-10 h-10 rounded-full bg-black/50 items-center justify-center"
           >
             <Feather name="arrow-left" size={24} color="#fff" />
           </Pressable>
 
-          {/* Image Counter */}
           {post.images && post.images.length > 1 && (
             <View className="absolute bottom-4 right-4 bg-black/60 px-3 py-1.5 rounded-full">
               <Text className="text-white text-xs font-semibold">
@@ -280,7 +282,6 @@ const PostDetail = () => {
             </View>
           )}
 
-          {/* Pagination Dots */}
           {post.images && post.images.length > 1 && (
             <View className="absolute bottom-4 left-0 right-0 flex-row justify-center">
               {post.images.map((_, index) => (
@@ -295,9 +296,7 @@ const PostDetail = () => {
           )}
         </View>
 
-        {/* Content */}
         <View className="px-5 py-6">
-          {/* Category Badge */}
           <View className="flex-row items-center mb-3">
             <View className="bg-green-500/20 px-3 py-1.5 rounded-full border border-green-500/30">
               <Text className="text-green-500 text-xs font-semibold">
@@ -306,17 +305,14 @@ const PostDetail = () => {
             </View>
           </View>
 
-          {/* Title */}
           <Text className="text-white text-2xl font-bold mb-2">
             {post.title}
           </Text>
 
-          {/* Price */}
           <Text className="text-green-500 text-3xl font-bold mb-4">
             LKR {post.price?.toLocaleString()}
           </Text>
 
-          {/* Description */}
           <View className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-4">
             <Text className="text-white font-semibold text-base mb-2">
               Description
@@ -326,13 +322,11 @@ const PostDetail = () => {
             </Text>
           </View>
 
-          {/* Details Grid */}
           <View className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-4">
             <Text className="text-white font-semibold text-base mb-3">
               Details
             </Text>
             
-            {/* Category-specific details */}
             {post.category === "Cars" || post.category === "Motorbikes" ? (
               <View className="gap-3">
                 {post.brand && <DetailRow label="Brand" value={post.brand} />}
@@ -362,12 +356,11 @@ const PostDetail = () => {
             )}
           </View>
 
-          {/* Seller Info */}
           <View className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-4">
             <Text className="text-white font-semibold text-base mb-3">
               Seller Information
             </Text>
-            <View className="flex-row items-center mb-3">
+            <View className="flex-row items-center">
               <View className="w-12 h-12 rounded-full bg-green-500/20 items-center justify-center mr-3">
                 <Feather name="user" size={24} color="#10b981" />
               </View>
@@ -376,63 +369,60 @@ const PostDetail = () => {
                   {post.userName}
                 </Text>
                 <Text className="text-white/50 text-sm">
-                  Seller
+                  {isOwnPost ? "You (Seller)" : "Seller"}
                 </Text>
               </View>
             </View>
           </View>
 
-          {/* Contact Actions - Only show if not own post */}
-          {user?.uid !== post.userId && (
-            <View className="mb-6">
-              <Text className="text-white font-semibold text-base mb-3">
-                Contact Seller
-              </Text>
-              
-              <View className="flex-row gap-3 mb-3">
-                {/* WhatsApp Button */}
-                <Pressable
-                  onPress={handleWhatsApp}
-                  className="flex-1 bg-[#25D366] py-3.5 rounded-2xl"
-                >
-                  <View className="flex-row items-center justify-center">
-                    <Feather name="message-circle" size={20} color="#fff" />
-                    <Text className="text-white font-semibold ml-2">
-                      WhatsApp
-                    </Text>
-                  </View>
-                </Pressable>
-
-                {/* Call Button */}
-                <Pressable
-                  onPress={handleCall}
-                  className="flex-1 bg-blue-500 py-3.5 rounded-2xl"
-                >
-                  <View className="flex-row items-center justify-center">
-                    <Feather name="phone" size={20} color="#fff" />
-                    <Text className="text-white font-semibold ml-2">
-                      Call
-                    </Text>
-                  </View>
-                </Pressable>
-              </View>
-
-              {/* Message Button */}
+          {/* ⚠️ ALWAYS SHOW BUTTONS FOR TESTING - Remove condition temporarily */}
+          <View className="mb-6">
+            <Text className="text-white font-semibold text-base mb-3">
+              Contact Seller {isOwnPost && "(Testing - Your Own Post)"}
+            </Text>
+            
+            <View className="flex-row gap-3 mb-3">
               <Pressable
-                onPress={handleMessage}
-                className="bg-green-500 py-3.5 rounded-2xl"
+                onPress={handleWhatsApp}
+                className="flex-1 bg-[#25D366] py-3.5 rounded-2xl"
+                style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
               >
                 <View className="flex-row items-center justify-center">
-                  <Feather name="mail" size={20} color="#fff" />
+                  <Feather name="message-circle" size={20} color="#fff" />
                   <Text className="text-white font-semibold ml-2">
-                    Send Message
+                    WhatsApp
+                  </Text>
+                </View>
+              </Pressable>
+
+              <Pressable
+                onPress={handleCall}
+                className="flex-1 bg-blue-500 py-3.5 rounded-2xl"
+                style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+              >
+                <View className="flex-row items-center justify-center">
+                  <Feather name="phone" size={20} color="#fff" />
+                  <Text className="text-white font-semibold ml-2">
+                    Call
                   </Text>
                 </View>
               </Pressable>
             </View>
-          )}
 
-          {/* Posted Date */}
+            <Pressable
+              onPress={handleMessage}
+              className="bg-green-500 py-3.5 rounded-2xl"
+              style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+            >
+              <View className="flex-row items-center justify-center">
+                <Feather name="mail" size={20} color="#fff" />
+                <Text className="text-white font-semibold ml-2">
+                  Send Message
+                </Text>
+              </View>
+            </Pressable>
+          </View>
+
           <Text className="text-white/40 text-xs text-center mb-6">
             Posted on {post.createdAt ? new Date(post.createdAt.seconds * 1000).toLocaleDateString() : "Recently"}
           </Text>
@@ -442,7 +432,6 @@ const PostDetail = () => {
   )
 }
 
-// Helper component for detail rows
 const DetailRow = ({ label, value }: { label: string; value: string }) => (
   <View className="flex-row justify-between items-center">
     <Text className="text-white/60 text-sm">{label}</Text>

@@ -43,7 +43,7 @@ const EditPost = () => {
     try {
       const postId = Array.isArray(id) ? id[0] : id
       const post = await getPostById(postId)
-      
+
       if (post) {
         setTitle(post.title || "")
         setDescription(post.description || "")
